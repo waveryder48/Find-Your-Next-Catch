@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0b1220;
+}
+body { color: white; background: var(--bg); }
+.container { max-width: 1100px; margin: 0 auto; padding: 1rem; }
+a { text-decoration: none; }
