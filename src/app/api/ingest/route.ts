@@ -28,12 +28,16 @@ const IngestSchema = z.object({
     sourceUrl: z.string().url(),
     canonicalUrl: z.string().url().optional(),
   }),
-  variants: z.array(z.object({
-    durationHours: z.number().int(),
-    isPrivate: z.boolean().default(True),
-    priceFrom: z.number().int(),
-    priceUnit: z.enum(['trip','person']).default('trip')
-  })).default([])
+  variants: z
+    .array(
+      z.object({
+        durationHours: z.number().int(),
+        isPrivate: z.boolean().default(true),
+        priceFrom: z.number().int(),
+        priceUnit: z.enum(['trip', 'person']).default('trip'),
+      })
+    )
+    .default([]),
 });
 
 export async function POST(req: Request) {
@@ -42,12 +46,15 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
   const prisma = getPrisma();
+
+  // No DB yet? Log and succeed so the build doesn’t break.
   if (!prisma) {
     console.log('[INGEST]', parsed.data);
     return NextResponse.json({ ok: true, mode: 'mock' });
   }
 
   const { provider, listing, variants } = parsed.data;
+
   const prov = await prisma.provider.upsert({
     where: { website: provider.website },
     update: { ...provider },
@@ -63,7 +70,7 @@ export async function POST(req: Request) {
   if (variants && variants.length) {
     await prisma.tripVariant.deleteMany({ where: { listingId: lst.id } });
     await prisma.tripVariant.createMany({
-      data: variants.map(v => ({ listingId: lst.id, ...v }))
+      data: variants.map((v) => ({ listingId: lst.id, ...v })),
     });
   }
 
