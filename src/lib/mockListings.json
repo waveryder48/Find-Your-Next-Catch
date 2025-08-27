@@ -1,0 +1,47 @@
+[
+    {
+        "id": "sd-6h-aloha",
+        "title": "San Diego 6-Hour Offshore — Aloha Spirit",
+        "description": "Target yellowtail, dorado, and tuna on a comfortable 33’ sportfisher with top-tier tackle.",
+        "location": "San Diego, CA",
+        "lat": 32.709,
+        "lng": -117.173,
+        "price": 950,
+        "duration": 6,
+        "capacity": 6,
+        "images": [
+            "/boats/aloha.jpg"
+        ],
+        "affiliateUrl": "https://example.com/captain/aloha"
+    },
+    {
+        "id": "sd-8h-pelagic",
+        "title": "San Diego Full-Day Bluewater — Pelagic Hunter",
+        "description": "Run-and-gun pelagics with an experienced captain. Live bait included.",
+        "location": "San Diego, CA",
+        "lat": 32.709,
+        "lng": -117.173,
+        "price": 1450,
+        "duration": 8,
+        "capacity": 6,
+        "images": [
+            "/boats/pelagic.jpg"
+        ],
+        "affiliateUrl": "https://example.com/captain/pelagic"
+    },
+    {
+        "id": "keys-4h-barracuda",
+        "title": "Florida Keys Backcountry — 4-Hour",
+        "description": "Inshore action for snook, reds, and cuda. Perfect for first-timers.",
+        "location": "Islamorada, FL",
+        "lat": 24.948,
+        "lng": -80.587,
+        "price": 600,
+        "duration": 4,
+        "capacity": 4,
+        "images": [
+            "/boats/keys.jpg"
+        ],
+        "affiliateUrl": "https://example.com/captain/keys"
+    }
+]
