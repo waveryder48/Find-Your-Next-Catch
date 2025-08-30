@@ -22,12 +22,9 @@ export async function GET(req: Request) {
     });
     return NextResponse.json({ listings });
   } catch (e: any) {
-    // expose details only when debug=1
     const url = new URL(req.url);
     const debug = url.searchParams.get("debug");
-    if (debug) {
-      return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
-    }
+    if (debug) return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }
