@@ -1,3 +1,7 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
 export async function POST(req: Request) {
   const key = process.env.INGEST_KEY;
   const provided = req.headers.get('x-ingest-key');
