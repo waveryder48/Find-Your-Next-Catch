@@ -1,38 +1,67 @@
 // src/app/api/scrape/route.ts
 import { NextResponse } from "next/server";
-import { fetchHtml, parseCharterPage } from "@/lib/scrape";
+import { z } from "zod";
+import { load } from "cheerio";
 
-export const runtime = "nodejs";
+export const runtime = "nodejs";           // Cheerio needs Node runtime
+export const dynamic = "force-dynamic";    // never cache scrape results
+
+const Body = z.object({ url: z.string().url() });
+
+export async function GET() {
+    // Handy ping so you can hit this in the browser
+    return NextResponse.json({ ok: true, hint: 'POST {"url":"https://example.com"}' });
+}
 
 export async function POST(req: Request) {
     try {
-        const { url, canonicalUrl } = await req.json();
-        if (!url) return NextResponse.json({ error: "Missing url" }, { status: 400 });
+        const { url } = Body.parse(await req.json());
 
-        // robots.txt check (very light)
-        const robots = new URL("/robots.txt", url).toString();
-        try {
-            const r = await fetch(robots);
-            if (r.ok) {
-                const txt = await r.text();
-                if (/Disallow:\s*\/\s*$/i.test(txt)) {
-                    return NextResponse.json({ error: "Blocked by robots.txt" }, { status: 403 });
-                }
-            }
-        } catch { /* ignore if missing */ }
-
-        const html = await fetchHtml(url);
-        const parsed = await parseCharterPage(html);
-
-        // forward to ingest (or call directly if you prefer)
-        const ingestRes = await fetch(`${process.env.NEXTAUTH_URL}/api/ingest`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "x-api-key": process.env.INGEST_API_KEY ?? "" },
-            body: JSON.stringify({ ...parsed, sourceUrl: url, canonicalUrl }),
+        // Fetch the page
+        const res = await fetch(url, {
+            redirect: "follow",
+            headers: {
+                "user-agent":
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome Safari",
+                accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            },
         });
-        const data = await ingestRes.json();
-        return NextResponse.json({ ok: true, data });
+        if (!res.ok) {
+            return NextResponse.json(
+                { ok: false, status: res.status, statusText: res.statusText },
+                { status: res.status }
+            );
+        }
+
+        const html = await res.text();
+        const $ = load(html);
+
+        // Simple demo parse: page title + first 50 absolute links
+        const title = $("title").first().text().trim() || null;
+        const links = Array.from(
+            new Set(
+                $("a[href]")
+                    .map((_, a) => {
+                        const href = $(a).attr("href");
+                        if (!href) return null;
+                        try { return new URL(href, url).href; } catch { return null; }
+                    })
+                    .get()
+            )
+        )
+            .filter(Boolean)
+            .slice(0, 50);
+
+        return NextResponse.json({ ok: true, url, title, links });
     } catch (e: any) {
-        return NextResponse.json({ error: e.message ?? "scrape failed" }, { status: 500 });
+        return NextResponse.json(
+            { ok: false, error: String(e?.message || e) },
+            { status: 400 }
+        );
     }
 }
+
+// (Optional) allow browser preflight if you’ll call from the client
+export async function OPTIONS() {
+    return new NextResponse(null, {
+        status: 204
