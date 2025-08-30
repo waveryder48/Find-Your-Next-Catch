@@ -64,4 +64,11 @@ export async function POST(req: Request) {
 // (Optional) allow browser preflight if you’ll call from the client
 export async function OPTIONS() {
     return new NextResponse(null, {
-        status: 204
+        status: 204,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+            "Access-Control-Allow-Headers": "content-type",
+        },
+    });
+}
