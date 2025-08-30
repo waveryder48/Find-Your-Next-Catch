@@ -1,0 +1,393 @@
+✅ What you’ve already set up
+
+Framework: Next.js (App Router) + TypeScript
+
+DB: Supabase (hosted Postgres)
+
+ORM: Prisma (schema + client)
+
+Hosting: Vercel (connected to your GitHub repo)
+
+Domain: findyournextcatch.com on GoDaddy → nameservers set to Vercel’s → Vercel project has findyournextcatch.com + www.findyournextcatch.com
+
+API: CRUD-ish routes for ingesting listings, fetching listings, recording leads/clickouts
+
+DB synced: Prisma schema was pushed; tables exist: Provider, Listing, TripVariant, Lead, Clickout
+
+Live ingestion: You tested a POST to /api/ingest (PowerShell-compatible)
+
+Crawler plan: External Playwright-based crawler posting to /api/ingest with an x-ingest-key header
+
+🔐 Environment variables (local + Vercel)
+
+Add these in two places: root .env (local dev) and Vercel → Project → Settings → Environment Variables.
+
+Required
+
+DATABASE_URL → Supabase Transaction Pooler (port 6543)
+
+postgresql://postgres.<YOUR-PROJECT-REF>:<PASSWORD>@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require
+
+
+DIRECT_URL → Supabase Direct (port 5432)
+
+postgresql://postgres:<PASSWORD>@db.<YOUR-PROJECT-REF>.supabase.co:5432/postgres?sslmode=require
+
+
+INGEST_KEY → any long random string (used by your crawler to authorize)
+
+Optional
+
+NEXT_PUBLIC_SITE_BASE → e.g., https://findyournextcatch.com (only needed if you prefer absolute URLs in server fetch)
+
+Keep .env out of git. Ensure your .gitignore contains /.env*.
+
+📁 Recommended repo structure (top-level)
+FindYourNextCatch/
+├─ prisma/
+│  └─ schema.prisma
+├─ src/
+│  ├─ app/
+│  │  ├─ api/
+│  │  │  ├─ listings/route.ts      # GET with filters (reads Prisma)
+│  │  │  ├─ ingest/route.ts        # POST to upsert provider/listing/variant (sec by x-ingest-key)
+│  │  │  ├─ leads/route.ts         # POST create lead
+│  │  │  └─ clickout/route.ts      # POST track clickouts
+│  │  ├─ page.tsx                  # homepage (fetches /api/listings)
+│  │  └─ search/page.tsx           # search results (q, city, state, price filters)
+│  ├─ components/
+│  │  ├─ SearchBar.tsx
+│  │  └─ ListingCard.tsx
+│  └─ lib/
+│     └─ db.ts                     # getPrisma() helper
+├─ package.json
+├─ next.config.js
+├─ tsconfig.json
+├─ .env                            # local env (DATABASE_URL, DIRECT_URL, INGEST_KEY)
+└─ README.md
+
+🧠 Critical file contents (canonical versions)
+1) package.json (scripts that make Vercel happy)
+{
+  "name": "sportfishing-aggregator-full-v1",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "postinstall": "prisma generate",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "next": "14.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "prisma": "5.22.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.5"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}
+
+2) next.config.js (no static export)
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: false,
+  // DO NOT set: output: 'export'  (breaks API routes)
+};
+module.exports = nextConfig;
+
+3) prisma/schema.prisma (DB shape you pushed)
+generator client { provider = "prisma-client-js" }
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum PriceUnit { trip person }
+
+model Provider {
+  id           String   @id @default(cuid())
+  name         String
+  website      String   @unique
+  phone        String?
+  email        String?
+  locationText String?
+  lat          Float?
+  lng          Float?
+  listings     Listing[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@index([name])
+  @@index([website])
+}
+
+model Listing {
+  id            String   @id @default(cuid())
+  providerId    String
+  provider      Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  city          String
+  state         String?
+  lat           Float?
+  lng           Float?
+  boatType      String?
+  boatLengthFt  Int?
+  capacity      Int?
+  amenities     String[]   // text[]
+  species       String[]   // text[]
+  images        String[]   // text[]
+  sourceUrl     String     @unique
+  canonicalUrl  String?
+  variants      TripVariant[]
+  leads         Lead[]
+  clickouts     Clickout[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  @@index([city, state])
+  @@index([providerId])
+}
+
+model TripVariant {
+  id            String    @id @default(cuid())
+  listingId     String
+  listing       Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  durationHours Int
+  isPrivate     Boolean   @default(true)
+  priceFrom     Int
+  priceUnit     PriceUnit @default(trip)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  @@index([listingId])
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  name        String
+  email       String
+  phone       String?
+  partySize   Int?
+  date        DateTime?
+  notes       String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  createdAt   DateTime @default(now())
+  @@index([listingId])
+  @@index([email])
+}
+
+model Clickout {
+  id         String   @id @default(cuid())
+  listingId  String?
+  listing    Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  target     String
+  userAgent  String?
+  ip         String?
+  createdAt  DateTime @default(now())
+  @@index([listingId])
+}
+
+4) src/lib/db.ts (Prisma singleton)
+import { PrismaClient } from '@prisma/client';
+let prisma: PrismaClient | undefined;
+export function getPrisma() {
+  if (!prisma) prisma = new PrismaClient();
+  return prisma;
+}
+
+5) API route “dynamic” headers (top of every Prisma-using route)
+
+Add these as the first lines in:
+
+src/app/api/listings/route.ts
+
+src/app/api/ingest/route.ts
+
+src/app/api/leads/route.ts
+
+src/app/api/clickout/route.ts
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
+6) src/app/api/ingest/route.ts (secure + upserts)
+
+(abbrev; key pieces)
+
+import { NextResponse } from 'next/server';
+import { getPrisma } from '@/lib/db';
+
+export async function POST(req: Request) {
+  // Auth via header
+  const key = process.env.INGEST_KEY;
+  const provided = req.headers.get('x-ingest-key');
+  if (key && provided !== key) {
+    return NextResponse.json({ ok:false, error:'Unauthorized' }, { status: 401 });
+  }
+
+  const prisma = getPrisma();
+  const { provider, listing, variants = [] } = await req.json();
+
+  // upsert provider
+  const prov = await prisma.provider.upsert({
+    where: { website: provider.website },
+    update: { name: provider.name, phone: provider.phone ?? undefined, email: provider.email ?? undefined },
+    create: { name: provider.name || new URL(provider.website).hostname, website: provider.website, phone: provider.phone ?? undefined, email: provider.email ?? undefined }
+  });
+
+  // upsert listing by sourceUrl
+  const lst = await prisma.listing.upsert({
+    where: { sourceUrl: listing.sourceUrl },
+    update: { providerId: prov.id, ...listing },
+    create: { providerId: prov.id, ...listing }
+  });
+
+  // one default variant
+  if (variants[0]) {
+    const v0 = variants[0];
+    await prisma.tripVariant.upsert({
+      where: { id: `${lst.id}-default` },
+      update: { durationHours: v0.durationHours, isPrivate: v0.isPrivate ?? true, priceFrom: v0.priceFrom, priceUnit: v0.priceUnit ?? 'trip' },
+      create: { id: `${lst.id}-default`, listingId: lst.id, durationHours: v0.durationHours, isPrivate: v0.isPrivate ?? true, priceFrom: v0.priceFrom, priceUnit: v0.priceUnit ?? 'trip' }
+    });
+  }
+
+  return NextResponse.json({ ok:true, providerId: prov.id, listingId: lst.id });
+}
+
+7) src/app/api/listings/route.ts (filters)
+
+(abbrev; key pieces)
+
+import { NextResponse } from 'next/server';
+import { getPrisma } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+
+export async function GET(req: Request) {
+  const prisma = getPrisma();
+  const { searchParams } = new URL(req.url);
+  const q = searchParams.get('q')?.trim() || undefined;
+  const city = searchParams.get('city')?.trim() || undefined;
+  const state = searchParams.get('state')?.trim() || undefined;
+  const minPrice = Number(searchParams.get('minPrice') || '') || undefined;
+  const maxPrice = Number(searchParams.get('maxPrice') || '') || undefined;
+  const limit = Math.min(Number(searchParams.get('limit') || 24), 50);
+  const offset = Math.max(Number(searchParams.get('offset') || 0), 0);
+
+  const where:any = {};
+  if (city) where.city = { equals: city, mode: 'insensitive' };
+  if (state) where.state = { equals: state, mode: 'insensitive' };
+  if (q) where.OR = [
+    { title: { contains: q, mode: 'insensitive' } },
+    { description: { contains: q, mode: 'insensitive' } },
+    { city: { contains: q, mode: 'insensitive' } },
+    { species: { hasSome: [q] } }
+  ];
+
+  const variantWhere:any = {};
+  if (minPrice !== undefined) variantWhere.priceFrom = { ...(variantWhere.priceFrom||{}), gte: minPrice };
+  if (maxPrice !== undefined) variantWhere.priceFrom = { ...(variantWhere.priceFrom||{}), lte: maxPrice };
+
+  const listings = await prisma.listing.findMany({
+    where,
+    include: {
+      provider: true,
+      variants: {
+        where: Object.keys(variantWhere).length ? variantWhere : undefined,
+        orderBy: { priceFrom: 'asc' }, take: 1
+      }
+    },
+    orderBy: [{ createdAt: 'desc' }], take: limit, skip: offset
+  });
+
+  return NextResponse.json(listings);
+}
+
+🚀 Re-deploy checklist (fresh machine/chat)
+
+Clone repo → npm install
+
+Create .env with DATABASE_URL, DIRECT_URL, INGEST_KEY
+
+npx prisma generate → npx prisma db push
+
+Verify Supabase tables in Table Editor
+
+Push to GitHub → Vercel auto-deploys
+
+Confirm Vercel Environment Variables match .env
+
+Hit https://findyournextcatch.com/api/listings → should return JSON
+
+Ingest one test listing (PowerShell):
+
+Invoke-WebRequest `
+  -Uri "https://findyournextcatch.com/api/ingest" `
+  -Method POST `
+  -Headers @{ "Content-Type"="application/json"; "x-ingest-key"="<YOUR_INGEST_KEY>" } `
+  -Body '{ "provider":{"name":"Pelagic Hunter","website":"https://pelagichunter.example.com"},
+           "listing":{"title":"Full-Day Offshore","city":"San Diego","state":"CA","capacity":6,
+                      "images":["https://placehold.co/800x450?text=Pelagic"],"species":["Tuna","Mahi"],
+                      "sourceUrl":"https://pelagichunter.example.com/trips/full-day"},
+           "variants":[{"durationHours":8,"isPrivate":true,"priceFrom":1450,"priceUnit":"trip"}] }'
+
+
+Refresh /api/listings — see data
+
+🤖 Crawler (recap)
+
+External folder crawler/ (separate Node project)
+
+.env inside crawler:
+
+SITE_BASE=https://findyournextcatch.com
+INGEST_ENDPOINT=/api/ingest
+INGEST_KEY=<same as Vercel>
+BOT_EMAIL=contact@findyournextcatch.com
+
+
+npm i playwright node-fetch@2
+
+npx playwright install chromium
+
+Script src/scrape-one.ts:
+
+Respect robots.txt
+
+Try JSON-LD + simple selectors
+
+POST to your /api/ingest with x-ingest-key
+
+Run:
+
+npm run one -- https://captain-site.com/trips/full-day
+
+🧯 Common gotchas (fast fixes)
+
+Prisma error “client not initialized” on Vercel → ensure postinstall: prisma generate and build: prisma generate && next build.
+
+Prerender error for API → add export const dynamic = 'force-dynamic' + runtime = 'nodejs' at top of API routes; don’t use output: 'export'.
+
+DIRECT_URL missing → Prisma reads .env by default; ensure both URLs are in .env (not only .env.local).
+
+Browser stuck on old Vercel URL → clear Edge cached redirects for your domain (you did this once).
+
+If you paste this into your new chat, I can pick up right away—just tell me which step you’re on and what error (if any) you’re seeing.

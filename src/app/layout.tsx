@@ -1,20 +1,19 @@
-import './globals.css';
-export const metadata = { title: 'ReelFind — Sportfishing Charters', description: 'Search & compare sportfishing charters.' };
+// src/app/layout.tsx
+import "./globals.css";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <header className="border-b border-white/10 sticky top-0 backdrop-blur bg-black/40">
-          <div className="container flex items-center justify-between py-4">
-            <a href="/" className="text-xl font-semibold tracking-tight">🎣 ReelFind</a>
-            <nav className="flex gap-6 text-sm">
-              <a className="opacity-80 hover:opacity-100" href="/search">Explore</a>
-              <a className="opacity-80 hover:opacity-100" href="/dashboard">For Captains</a>
-            </nav>
+      <body className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
+        <header className="sticky top-0 z-10 backdrop-blur bg-white/70 border-b">
+          <div className="mx-auto max-w-6xl px-4 h-14 flex items-center gap-3">
+            <a href="/" className="font-bold">FindYourNextCatch</a>
+            <form action="/search" className="ml-auto flex gap-2">
+              <input name="q" placeholder="Search charters, cities..." className="rounded-xl border px-3 py-1.5" />
+              <button className="rounded-xl border px-3 py-1.5 hover:bg-gray-50">Search</button>
+            </form>
           </div>
         </header>
-        <main className="container py-8">{children}</main>
-        <footer className="container py-10 opacity-70 text-sm">© 2025 ReelFind</footer>
+        <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
       </body>
     </html>
   );
