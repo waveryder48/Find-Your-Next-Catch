@@ -24,7 +24,7 @@ export default async function ListingDetail({ params }: { params: { id: string }
         canonicalUrl={l.canonicalUrl ?? undefined}
         species={l.species ?? []}
         seasonTags={[]}
-        variants={l.variants.map((v) => ({
+        variants={l.variants.map(v => ({
           id: v.id,
           durationHours: v.durationHours,
           isPrivate: v.isPrivate ?? false,
@@ -34,8 +34,6 @@ export default async function ListingDetail({ params }: { params: { id: string }
         }))}
         updatedAt={l.updatedAt}
       />
-
-      {/* Room for extra sections: gallery, amenities, map, provider info, price history, etc. */}
     </div>
   );
 }
