@@ -6,15 +6,11 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
     try {
-        // optional: quick connectivity ping
-        await prisma.$queryRaw`SELECT 1`;
-
-        // run simple queries sequentially (avoid transaction with PgBouncer)
+        // Avoid $queryRaw against PgBouncer to sidestep prepared-statement semantics
         const providers = await prisma.provider.count();
         const listings = await prisma.listing.count();
         const variants = await prisma.tripVariant.count();
 
-        // show a redacted view of the DB host
         let info: any = {};
         try {
             const u = new URL(process.env.DATABASE_URL || "");
@@ -23,6 +19,7 @@ export async function GET() {
 
         return NextResponse.json({ ok: true, db: info, counts: { providers, listings, variants } });
     } catch (e: any) {
-        return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
+        console.error("/api/health failed:", e);
+        return NextResponse.json({ ok: false, error: e?.message ?? String(e) }, { status: 500 });
     }
 }
