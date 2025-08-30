@@ -1,3 +1,12 @@
+export async function POST(req: Request) {
+  const key = process.env.INGEST_KEY;
+  const provided = req.headers.get('x-ingest-key');
+  if (key && provided !== key) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  }
+  // ...existing logic...
+}
+
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getPrisma } from '@/lib/db';
@@ -28,6 +37,7 @@ const IngestSchema = z.object({
     sourceUrl: z.string().url(),
     canonicalUrl: z.string().url().optional(),
   }),
+<<<<<<< HEAD
   variants: z
     .array(
       z.object({
@@ -38,6 +48,14 @@ const IngestSchema = z.object({
       })
     )
     .default([]),
+=======
+  variants: z.array(z.object({
+    durationHours: z.number().int(),
+    isPrivate: z.boolean().default(True),
+    priceFrom: z.number().int(),
+    priceUnit: z.enum(['trip', 'person']).default('trip')
+  })).default([])
+>>>>>>> 0d5ae26 (added ingest auth key + crawler prep)
 });
 
 export async function POST(req: Request) {

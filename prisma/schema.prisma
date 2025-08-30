@@ -1,0 +1,123 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------- Enums ----------
+enum PriceUnit {
+  trip
+  person
+}
+
+// ---------- Models ----------
+model Provider {
+  id           String   @id @default(cuid())
+  name         String
+  website      String   @unique
+  phone        String?
+  email        String?
+  locationText String?
+  lat          Float?
+  lng          Float?
+
+  listings     Listing[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([name])
+  @@index([website])
+}
+
+model Listing {
+  id            String        @id @default(cuid())
+  providerId    String
+  provider      Provider      @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  title         String
+  description   String?
+  city          String
+  state         String?
+  lat           Float?
+  lng           Float?
+  boatType      String?
+  boatLengthFt  Int?
+  capacity      Int?
+  amenities     String[]      // Postgres text[]
+  species       String[]      // Postgres text[]
+  images        String[]      // Postgres text[]
+
+  sourceUrl     String        @unique
+  canonicalUrl  String?
+
+  variants      TripVariant[]
+  leads         Lead[]
+  clickouts     Clickout[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([city, state])
+  @@index([providerId])
+}
+
+model TripVariant {
+  id            String    @id @default(cuid())
+  listingId     String
+  listing       Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  durationHours Int
+  isPrivate     Boolean   @default(true)
+  priceFrom     Int
+  priceUnit     PriceUnit @default(trip)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([listingId])
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  listingId   String
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  name        String
+  email       String
+  phone       String?
+  partySize   Int?
+  date        DateTime?
+  notes       String?
+
+  // attribution
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([listingId])
+  @@index([email])
+}
+
+model Clickout {
+  id         String   @id @default(cuid())
+  listingId  String?
+  listing    Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+
+  target     String
+  userAgent  String?
+  ip         String?
+
+  createdAt  DateTime @default(now())
+
+  @@index([listingId])
+}
+
