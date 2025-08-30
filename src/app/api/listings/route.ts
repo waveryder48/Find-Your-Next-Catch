@@ -3,9 +3,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
-export const runtime = "nodejs"; // Prisma must run on Node, not Edge
+export const runtime = "nodejs";
 
-// POST /api/listings  -> create or upsert a listing
 const CreateListing = z.object({
   title: z.string().min(1),
   sourceUrl: z.string().url(),
@@ -13,6 +12,25 @@ const CreateListing = z.object({
   state: z.string().optional(),
   description: z.string().optional(),
 });
+
+export async function GET(req: Request) {
+  try {
+    const listings = await prisma.listing.findMany({
+      include: { provider: true, variants: true },
+      orderBy: { updatedAt: "desc" },
+      take: 50,
+    });
+    return NextResponse.json({ listings });
+  } catch (e: any) {
+    // expose details only when debug=1
+    const url = new URL(req.url);
+    const debug = url.searchParams.get("debug");
+    if (debug) {
+      return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
+    }
+    return NextResponse.json({ ok: false }, { status: 500 });
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -47,16 +65,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, listing }, { status: 201 });
   } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e.message }, { status: 400 });
+    return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 400 });
   }
-}
-
-// GET /api/listings  -> list recent listings
-export async function GET() {
-  const listings = await prisma.listing.findMany({
-    include: { provider: true, variants: true },
-    orderBy: { updatedAt: "desc" },
-    take: 50,
-  });
-  return NextResponse.json({ listings });
 }
