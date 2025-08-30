@@ -36,4 +36,7 @@ export default async function ListingsPage() {
             ))}
         </div>
     );
+    export const dynamic = "force-dynamic";   // disables static prerender for this page
+    // or: export const revalidate = 0;
+
 }
