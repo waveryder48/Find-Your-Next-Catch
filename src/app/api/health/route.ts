@@ -1,3 +1,4 @@
+// src/app/api/health/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -6,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
     try {
-        // Avoid $queryRaw against PgBouncer to sidestep prepared-statement semantics
+        // No $queryRaw (prepared statements can trip PgBouncer)
         const providers = await prisma.provider.count();
         const listings = await prisma.listing.count();
         const variants = await prisma.tripVariant.count();
