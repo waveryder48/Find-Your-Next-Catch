@@ -1,39 +1,42 @@
-// src/app/listings/[id]/page.tsx
-import TripCard from "@/components/trips/TripCard";
-import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
-export const revalidate = 600;
+type Props = { params: { id: string } };
 
-export default async function ListingDetail({ params }: { params: { id: string } }) {
-  const l = await prisma.listing.findUnique({
-    where: { id: params.id },
+export default async function ListingDetailsPage({ params }: Props) {
+  const listing = await prisma.listing.findUnique({
+    where: { id: params.id }, // cuid string
     include: { provider: true, variants: true },
   });
-  if (!l) return notFound();
 
-  const port = [l.city, l.state].filter(Boolean).join(", ");
+  if (!listing) return notFound();
+
+  const raw = listing.provider?.website || listing.sourceUrl;
+  const isUrl = (u?: string | null) =>
+    !!u && (/^https?:\/\//i.test(u) || (/\.[a-z]{2,}($|[\/?#])/i.test(u) && !/\s/.test(u)));
+  const providerUrl = isUrl(raw) ? (/^https?:\/\//i.test(raw!) ? raw : `https://${raw}`) : null;
 
   return (
-    <div className="space-y-6">
-      <TripCard
-        charterName={l.title || l.provider.name}
-        port={port || undefined}
-        description={l.description || undefined}
-        website={l.sourceUrl}
-        canonicalUrl={l.canonicalUrl ?? undefined}
-        species={l.species ?? []}
-        seasonTags={[]}
-        variants={l.variants.map(v => ({
-          id: v.id,
-          durationHours: v.durationHours,
-          isPrivate: v.isPrivate ?? false,
-          priceFrom: v.priceFrom ?? null,
-          priceUnit: v.priceUnit,
-          lastObservedAt: v.updatedAt,
-        }))}
-        updatedAt={l.updatedAt}
-      />
-    </div>
+    <main className="mx-auto max-w-5xl p-6">
+      <h1 className="text-3xl font-bold">{listing.title ?? "Untitled Vessel"}</h1>
+      <p className="mt-2 text-sm text-gray-600">
+        {[listing.city, listing.state].filter(Boolean).join(", ")}
+      </p>
+
+      <div className="mt-6 space-y-4">
+        <p>{listing.description || "No description provided."}</p>
+        {providerUrl && (
+          <a
+            href={providerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block rounded-lg border px-4 py-2 hover:bg-gray-50"
+          >
+            Visit provider site
+          </a>
+        )}
+      </div>
+    </main>
   );
 }

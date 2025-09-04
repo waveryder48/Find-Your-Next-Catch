@@ -1,0 +1,18 @@
+﻿{
+  "fishermanslanding.com":        { "providerWebsite": "https://www.fishermanslanding.com/",           "city": "San Diego",        "state": "CA" },
+  "hmlanding.com":                { "providerWebsite": "https://www.hmlanding.com/",                   "city": "San Diego",        "state": "CA" },
+  "pointlomasportfishing.com":    { "providerWebsite": "https://www.pointlomasportfishing.com/",       "city": "San Diego",        "state": "CA" },
+  "seaforthlanding.com":          { "providerWebsite": "https://www.seaforthlanding.com/",             "city": "San Diego",        "state": "CA" },
+  "danawharf.com":                { "providerWebsite": "https://danawharf.com/",                        "city": "Dana Point",       "state": "CA" },
+  "daveyslocker.com":             { "providerWebsite": "https://daveyslocker.com/",                     "city": "Newport Beach",    "state": "CA" },
+  "pierpoint.net":                { "providerWebsite": "https://pierpoint.net/",                        "city": "Long Beach",       "state": "CA" },
+  "longbeachsportfishing.org":    { "providerWebsite": "https://www.longbeachsportfishing.org/",        "city": "Long Beach",       "state": "CA" },
+  "22ndstreet.com":               { "providerWebsite": "https://www.22ndstreet.com/",                   "city": "San Pedro",        "state": "CA" },
+  "redondosportfishing.com":      { "providerWebsite": "https://www.redondosportfishing.com/",          "city": "Redondo Beach",    "state": "CA" },
+  "mdrsf.com":                    { "providerWebsite": "https://mdrsf.com/",                            "city": "Marina del Rey",   "state": "CA" },
+  "channelislandssportfishing.com":{ "providerWebsite": "https://www.channelislandssportfishing.com/", "city": "Oxnard",           "state": "CA" },
+  "hookslanding.net":             { "providerWebsite": "https://www.hookslanding.net/",                 "city": "Oxnard",           "state": "CA" },
+  "venturasportfishing.com":      { "providerWebsite": "https://venturasportfishing.com/",              "city": "Ventura",          "state": "CA" },
+  "stardustsportfishing.com":     { "providerWebsite": "https://www.stardustsportfishing.com/",         "city": "Santa Barbara",    "state": "CA" },
+  "morrobaylanding.com":          { "providerWebsite": "https://morrobaylanding.com/",                  "city": "Morro Bay",        "state": "CA" }
+}
