@@ -1,11 +1,5 @@
 import "./globals.css";
 import Link from "next/link";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Find Your Next Catch",
-    description: "Browse Southern California sportfishing charters.",
-};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (

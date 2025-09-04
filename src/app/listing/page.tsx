@@ -1,5 +1,5 @@
-// src/app/listing/page.tsx
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
 function isProbablyUrl(raw?: string | null) {
     if (!raw) return false;
@@ -19,16 +19,31 @@ function googleSearchUrl(parts: (string | null | undefined)[]) {
     return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
 }
 
+export const dynamic = "force-dynamic"; // don't cache the page at build time
+
 export default async function ListingGridPage() {
-    const res = await fetch(`/api/listings?limit=50`, { cache: "no-store" });
-    const data = await res.json();
-    const rows: any[] = Array.isArray(data.value) ? data.value : [];
+    let rows: any[] = [];
+    try {
+        rows = await prisma.listing.findMany({
+            take: 50,
+            include: { provider: true },
+            orderBy: { createdAt: "desc" },
+        });
+    } catch (err) {
+        console.error("Error loading listings:", err);
+        // Show a tiny fallback so the page doesn't hard-crash
+        return (
+            <main className="p-6">
+                <p>Sorry, we couldn’t load listings right now.</p>
+            </main>
+        );
+    }
 
     return (
         <main className="p-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {rows.map((r) => {
                 const detailsHref = `/listing/${r.id}`;
-                const providerRaw = r?.provider?.website || r?.providerWebsite || r?.sourceUrl;
+                const providerRaw = r?.provider?.website || r?.sourceUrl;
                 const providerUrl = toExternalUrlOrNull(providerRaw);
                 const searchUrl = googleSearchUrl([r?.title, r?.provider?.name, r?.city, r?.state, "fishing charter"]);
 
@@ -41,6 +56,7 @@ export default async function ListingGridPage() {
                             <Link href={detailsHref} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
                                 View details
                             </Link>
+
                             {providerUrl ? (
                                 <a href={providerUrl} target="_blank" rel="noopener noreferrer" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
                                     Visit provider

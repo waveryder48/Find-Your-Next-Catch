@@ -1,22 +1,39 @@
-// src/app/listing/[id]/page.tsx
 import { notFound } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 type Props = { params: { id: string } };
 
+function isProbablyUrl(raw?: string | null) {
+  if (!raw) return false;
+  const s = String(raw).trim();
+  if (!/^https?:\/\//i.test(s) && /\s/.test(s)) return false;
+  if (/\.[a-z]{2,}($|[\/?#])/i.test(s)) return true;
+  return /^https?:\/\//i.test(s);
+}
+function toExternalUrlOrNull(raw?: string | null) {
+  if (!raw) return null;
+  const s = String(raw).trim();
+  if (!isProbablyUrl(s)) return null;
+  return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+}
+
 export default async function ListingDetailsPage({ params }: Props) {
-  const listing = await prisma.listing.findUnique({
-    where: { id: params.id },
-    include: { provider: true, variants: true },
-  });
+  let listing: any = null;
+  try {
+    listing = await prisma.listing.findUnique({
+      where: { id: params.id }, // cuid string
+      include: { provider: true, variants: true },
+    });
+  } catch (err) {
+    console.error("Error loading listing:", err);
+    return notFound();
+  }
 
   if (!listing) return notFound();
 
-  const raw = listing.provider?.website || listing.sourceUrl;
-  const isUrl = (u?: string | null) =>
-    !!u && (/^https?:\/\//i.test(u) || (/\.[a-z]{2,}($|[\/?#])/i.test(u) && !/\s/.test(u)));
-  const providerUrl = isUrl(raw) ? (/^https?:\/\//i.test(raw!) ? raw : `https://${raw}`) : null;
+  const providerUrl = toExternalUrlOrNull(listing.provider?.website || listing.sourceUrl);
 
   return (
     <main className="mx-auto max-w-5xl p-6">
