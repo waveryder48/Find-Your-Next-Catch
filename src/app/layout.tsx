@@ -4,17 +4,25 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Find Your Next Catch",
-  description: "Southern California Sportfishing Charter Aggregator",
+  description: "Browse sportfishing vessels across Southern California",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body
-        className="min-h-screen bg-fixed bg-cover bg-top text-slate-900"
-        style={{ backgroundImage: "url('/bg-ocean.png')" }}
+        className="min-h-screen bg-fixed bg-top bg-cover text-slate-900"
+        style={{
+          backgroundImage: "url('/bg-ocean.png')", // <-- file must be at /public/bg-ocean.png
+          backgroundRepeat: "no-repeat",
+        }}
       >
-        {children}
+        {/* optional subtle overlay to keep text readable */}
+        <div className="min-h-screen bg-white/0">{children}</div>
       </body>
     </html>
   );

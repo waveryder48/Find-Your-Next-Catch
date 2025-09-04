@@ -25,12 +25,14 @@ export default async function HomePage() {
         </p>
 
         {/* Matches color scheme: blue button with white text */}
+        // src/app/page.tsx  (only the button changed)
         <Link
           href="/listing"
-          className="px-6 py-3 rounded-lg shadow bg-blue-600 text-white hover:bg-blue-700 transition"
+          className="px-6 py-3 rounded-lg shadow border border-black bg-white text-black hover:bg-gray-100 transition"
         >
-          View Listings
+          Vessels
         </Link>
+
       </section>
 
       {/* Latest vessels */}
