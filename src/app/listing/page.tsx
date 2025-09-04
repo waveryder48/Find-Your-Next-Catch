@@ -1,8 +1,7 @@
 // src/app/listing/page.tsx
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 0; // run on request; avoid build-time DB queries
+export const revalidate = 0;
 
 const isUrl = (s?: string | null) =>
     !!s && (/^https?:\/\//i.test(s) || (/\.[a-z]{2,}($|[\/?#])/i.test(s) && !/\s/.test(s)));
@@ -22,8 +21,8 @@ export default async function ListingPage() {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {listings.map((r) => {
-                    const vesselUrl = toUrl(r.sourceUrl);          // vessel website
-                    const providerUrl = toUrl(r.provider?.website); // provider website
+                    const vesselUrl = toUrl(r.sourceUrl);
+                    const providerUrl = toUrl(r.provider?.website);
 
                     return (
                         <div key={r.id} className="rounded-2xl p-4 shadow border bg-white">
@@ -35,17 +34,14 @@ export default async function ListingPage() {
                             <div className="mt-3 flex flex-wrap gap-3">
                                 {vesselUrl && (
                                     <a href={vesselUrl} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
-                                        View details
+                                        Vessel Information
                                     </a>
                                 )}
                                 {providerUrl && (
                                     <a href={providerUrl} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
-                                        Visit provider
+                                        Landing Website
                                     </a>
                                 )}
-                                <Link href={`/listing/${r.id}`} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
-                                    More info
-                                </Link>
                             </div>
                         </div>
                     );
