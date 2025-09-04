@@ -1,10 +1,10 @@
 ﻿// src/app/layout.tsx
-import "./globals.css";
 import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Find Your Next Catch",
-  description: "Browse sportfishing vessels across Southern California",
+  description: "Southern California sportfishing vessel listings",
 };
 
 export default function RootLayout({
@@ -14,15 +14,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className="min-h-screen bg-fixed bg-top bg-cover text-slate-900"
-        style={{
-          backgroundImage: "url('/bg-ocean.png')", // <-- file must be at /public/bg-ocean.png
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        {/* optional subtle overlay to keep text readable */}
-        <div className="min-h-screen bg-white/0">{children}</div>
+      <body className="min-h-screen text-slate-900 relative">
+        {/* Background + overlay */}
+        <div
+          className="fixed inset-0 bg-cover bg-center bg-fixed"
+          style={{ backgroundImage: "url('/bg-ocean.jpg')" }}
+        >
+          {/* Overlay tint */}
+          <div className="absolute inset-0 bg-white/70"></div>
+        </div>
+
+        {/* Content goes above overlay */}
+        <main className="relative z-10">{children}</main>
       </body>
     </html>
   );
