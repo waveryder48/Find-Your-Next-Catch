@@ -16,10 +16,10 @@ export default async function HomePage() {
   });
 
   return (
-    <main className="mx-auto max-w-12xl p-12">
+    <main className="mx-auto max-w-6xl p-6">
       {/* Hero */}
       <section className="flex flex-col items-center text-center py-16">
-        <h1 className="text-12xl font-bold mb-12">Find Your Next Catch</h1>
+        <h1 className="text-24xl font-bold mb-24">Find Your Next Catch</h1>
         <p className="text-2xl mb-2">
           Your home to your next sportfishing adventure!
         </p>
