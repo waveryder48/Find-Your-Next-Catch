@@ -9,6 +9,14 @@ export function isProbablyUrl(raw?: string | null) {
     if (/\.[a-z]{2,}($|[\/?#])/i.test(s)) return true;
     return /^https?:\/\//i.test(s);
 }
+
+export function normalizeUrlOrNull(raw?: string | null) {
+    if (!raw) return null;
+    const s = String(raw).trim();
+    if (!isProbablyUrl(s)) return null;
+    return /^https?:\/\//i.test(s) ? s : `https://${s}`;
+}
+
 export function toExternalUrlOrNull(raw?: string | null) {
     if (!raw) return null;
     const s = String(raw).trim();

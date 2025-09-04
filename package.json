@@ -6,31 +6,34 @@
     "postinstall": "prisma generate",
     "build": "next build",
     "dev": "next dev",
-    "start": "next start"
+    "start": "next start",
+    "import:xls": "tsx scripts/import-from-xls.ts"
   },
   "engines": {
     "node": ">=18.18.0 <23"
   },
   "dependencies": {
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^5.22.0",
     "cheerio": "^1.1.2",
     "csv-parser": "^3.2.0",
-    "dotenv": "^17.2.1",
+    "dotenv": "^16.4.5",
     "next": "14.2.5",
     "pg": "^8.16.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",
     "@types/node": "^24.3.0",
-    "@types/react": "^19.1.12",
+    "@types/react": "^19.0.12",
     "@types/react-dom": "^19.1.9",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
-    "prisma": "^6.15.0",
+    "prisma": "^5.22.0",
     "tailwindcss": "^4.1.12",
+    "tsx": "^4.19.1",
     "typescript": "^5.9.2"
   }
 }
