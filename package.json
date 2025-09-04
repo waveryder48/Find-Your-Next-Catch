@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "postinstall": "prisma generate",
-    "build": "next build",
+    "build": "cross-env LIGHTNINGCSS_IGNORE_NATIVE=1 next build",
     "dev": "next dev",
     "start": "next start",
     "import:xls": "tsx scripts/import-from-xls.ts"
-  },
+  }
+  
+
   "engines": {
     "node": ">=18.18.0 <23"
   },
@@ -30,6 +32,7 @@
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.1.9",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^10.0.0",
     "postcss": "^8.5.6",
     "prisma": "^5.22.0",
     "tailwindcss": "^4.1.12",
