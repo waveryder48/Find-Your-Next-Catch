@@ -1,3 +1,4 @@
+// src/app/listing/page.tsx
 import Link from "next/link";
 
 function isProbablyUrl(raw?: string | null) {
@@ -19,7 +20,6 @@ function googleSearchUrl(parts: (string | null | undefined)[]) {
 }
 
 export default async function ListingGridPage() {
-    // RELATIVE fetch to avoid base-url issues
     const res = await fetch(`/api/listings?limit=50`, { cache: "no-store" });
     const data = await res.json();
     const rows: any[] = Array.isArray(data.value) ? data.value : [];
@@ -28,59 +28,29 @@ export default async function ListingGridPage() {
         <main className="p-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {rows.map((r) => {
                 const detailsHref = `/listing/${r.id}`;
-
-                // prefer provider.website, then listing.sourceUrl (only if it looks like a real URL)
                 const providerRaw = r?.provider?.website || r?.providerWebsite || r?.sourceUrl;
                 const providerUrl = toExternalUrlOrNull(providerRaw);
                 const searchUrl = googleSearchUrl([r?.title, r?.provider?.name, r?.city, r?.state, "fishing charter"]);
 
                 return (
-                    <div key={r.id} className="rounded-2xl p-4 shadow hover:shadow-lg border">
-                        <h3 className="font-semibold text-lg mb-1">
-                            {r?.title || "Untitled Vessel"}
-                        </h3>
-                        <p className="text-sm opacity-80">
-                            {[r?.city, r?.state].filter(Boolean).join(", ")}
-                        </p>
+                    <div key={r.id} className="rounded-2xl p-4 shadow hover:shadow-lg border bg-white">
+                        <h3 className="font-semibold text-lg mb-1">{r?.title || "Untitled Vessel"}</h3>
+                        <p className="text-sm opacity-80">{[r?.city, r?.state].filter(Boolean).join(", ")}</p>
 
                         <div className="mt-4 flex flex-wrap gap-3">
-                            {/* INTERNAL link → must be /listing/[id] */}
                             <Link href={detailsHref} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
                                 View details
                             </Link>
-
-                            {/* EXTERNAL link → only if providerUrl is a real URL; else fallback to search */}
                             {providerUrl ? (
-                                <a
-                                    href={providerUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-lg border px-3 py-1.5 hover:bg-gray-50"
-                                >
+                                <a href={providerUrl} target="_blank" rel="noopener noreferrer" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
                                     Visit provider
                                 </a>
                             ) : (
-                                <a
-                                    href={searchUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-lg border px-3 py-1.5 hover:bg-gray-50"
-                                    title="Provider URL unavailable—search instead"
-                                >
+                                <a href={searchUrl} target="_blank" rel="noopener noreferrer" className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
                                     Search provider
                                 </a>
                             )}
                         </div>
-
-                        {/* DEBUG: show the exact hrefs rendered */}
-                        <p className="mt-3 text-xs text-gray-500 break-all">
-                            internal: <code>{detailsHref}</code>
-                            {providerUrl ? (
-                                <> · provider: <code>{providerUrl}</code></>
-                            ) : (
-                                <> · provider: <em>none (search fallback)</em></>
-                            )}
-                        </p>
                     </div>
                 );
             })}

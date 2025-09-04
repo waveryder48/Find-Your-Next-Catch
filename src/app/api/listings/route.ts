@@ -1,5 +1,7 @@
+// src/app/api/listings/route.ts
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 function isProbablyUrl(raw?: string | null) {
     if (!raw) return false;
@@ -25,13 +27,10 @@ export async function GET(req: Request) {
         orderBy: { createdAt: "desc" },
     });
 
-    // sanitize outgoing URLs so the UI never gets junk
     const value = rows.map((l) => ({
         ...l,
         sourceUrl: toExternalUrlOrNull(l.sourceUrl),
-        provider: l.provider
-            ? { ...l.provider, website: toExternalUrlOrNull(l.provider.website) }
-            : null,
+        provider: l.provider ? { ...l.provider, website: toExternalUrlOrNull(l.provider.website) } : null,
     }));
 
     return NextResponse.json({ ok: true, count: value.length, value });

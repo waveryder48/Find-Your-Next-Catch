@@ -1,6 +1,13 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  // v4 can work without 'content'; keep config only if customizing theme/plugins
-  theme: { extend: {} },
+import type { Config } from "tailwindcss";
+
+export default {
+  content: [
+    "./src/app/**/*.{ts,tsx}",
+    "./src/components/**/*.{ts,tsx}",
+    "./src/lib/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
   plugins: [],
-};
+} satisfies Config;

@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
-            <body className="min-h-screen bg-white antialiased">
-                <header className="border-b">
+            <body className="min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-900 antialiased">
+                <header className="border-b bg-white/70 backdrop-blur">
                     <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-6">
                         <Link href="/" className="font-semibold">FindYourNextCatch</Link>
                         <nav className="flex items-center gap-4 text-sm">
                             <Link href="/">Home</Link>
-                            <Link href="/listing">Listings</Link> {/* singular since that's your working route */}
+                            <Link href="/listing">Listings</Link>
                         </nav>
                     </div>
                 </header>
