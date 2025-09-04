@@ -2,20 +2,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import clsx from "clsx";
+import React from "react";
 
-export default function BackButton({ className }: { className?: string }) {
+type Props = {
+    className?: string;
+    label?: string;
+};
+
+export default function BackButton({ className = "", label = "Back" }: Props) {
     const router = useRouter();
+
+    const base =
+        "inline-flex items-center gap-2 rounded-lg border border-black px-3 py-1.5 " +
+        "bg-white text-black hover:bg-gray-50 transition";
+
     return (
         <button
+            type="button"
             onClick={() => router.back()}
-            className={clsx(
-                "inline-flex items-center gap-2 rounded-lg border border-black bg-white px-3 py-1.5 text-sm hover:bg-gray-100 transition",
-                className
-            )}
+            className={`${base} ${className}`}
             aria-label="Go back"
         >
-            ← Back
+            ← {label}
         </button>
     );
 }
