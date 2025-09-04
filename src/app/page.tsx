@@ -19,18 +19,16 @@ export default async function HomePage() {
     <main className="mx-auto max-w-6xl p-6">
       {/* Hero */}
       <section className="flex flex-col items-center text-center py-16">
-        <h1 className="text-4xl font-bold mb-4">Find Your Next Catch</h1>
-        <p className="text-lg mb-8">
-          Browse sportfishing vessels across Southern California.
+        <h1 className="text-12xl font-bold mb-12">Find Your Next Catch</h1>
+        <p className="text-2xl mb-2">
+          Your home to your next sportfishing adventure!
         </p>
 
-        {/* Matches color scheme: blue button with white text */}
-        // src/app/page.tsx  (only the button changed)
         <Link
           href="/listing"
           className="px-6 py-3 rounded-lg shadow border border-black bg-white text-black hover:bg-gray-100 transition"
         >
-          Vessels
+          All Vessels
         </Link>
 
       </section>
