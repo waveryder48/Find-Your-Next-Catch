@@ -17,28 +17,31 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.className} min-h-screen text-slate-900`}>
-        {/* Fixed background image layer (persists on scroll & across pages) */}
+      <body className={`${inter.className} min-h-screen text-slate-900 bg-transparent`}>
+        {/* Fixed background layer (no negative z-index) */}
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10 bg-cover bg-top"
+          className="fixed inset-0 z-0 bg-cover bg-top"
           style={{
             backgroundImage: "url('/bg-ocean.jpg')",
             backgroundAttachment: "fixed",
           }}
         />
-        {/* Optional subtle tint to improve foreground readability */}
+
+        {/* Optional subtle tint for readability */}
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10"
+          className="fixed inset-0 z-0"
           style={{
             background:
               "linear-gradient(to bottom, rgba(255,255,255,0.0), rgba(255,255,255,0.05))",
           }}
         />
 
-        {/* App content */}
-        {children}
+        {/* App content sits above the background */}
+        <div className="relative z-10">
+          {children}
+        </div>
       </body>
     </html>
   );
