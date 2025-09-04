@@ -38,3 +38,11 @@ html,
 body {
     background-color: transparent !important;
 }
+
+main,
+section,
+header,
+footer,
+.container {
+    background: transparent;
+}
