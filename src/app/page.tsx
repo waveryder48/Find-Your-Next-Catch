@@ -62,3 +62,21 @@ export default async function HomePage() {
     </main>
   );
 }
+// src/app/page.tsx
+import Link from "next/link";
+
+export default function HomePage() {
+  return (
+    <main className="flex flex-col items-center justify-center min-h-screen text-center">
+      <h1 className="text-4xl font-bold mb-6">Find Your Next Catch</h1>
+      <p className="mb-8 text-lg">Browse sportfishing vessels across Southern California</p>
+
+      <Link
+        href="/listing"
+        className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+      >
+        View Listings
+      </Link>
+    </main>
+  );
+}

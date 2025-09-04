@@ -1,10 +1,9 @@
-﻿// src/app/layout.tsx
+﻿import type { Metadata } from "next";
 import "./globals.css";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Find Your Next Catch",
-  description: "Browse Southern California sportfishing charters.",
+  description: "Southern California sportfishing charter aggregator",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -12,11 +11,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body
         className="min-h-screen bg-fixed bg-cover bg-top text-slate-900"
-        style={{
-          backgroundImage: "url('/bg-ocean.jpg')",
-        }}
+        style={{ backgroundImage: "url('/bg-ocean.png')" }}
       >
-        {/* Optional subtle overlay for readability */}
+        {/* Overlay for readability */}
         <div className="min-h-screen bg-white/40">
           {children}
         </div>

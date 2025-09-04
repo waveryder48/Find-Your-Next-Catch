@@ -1,64 +1,68 @@
+// src/app/listing/page.tsx
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
-const isUrl = (s?: string | null) =>
-    !!s && (/^https?:\/\//i.test(s) || (/\.[a-z]{2,}($|[\/?#])/i.test(s) && !/\s/.test(s)));
-const toUrl = (s?: string | null) => !isUrl(s) ? null : /^https?:\/\//i.test(s!) ? s! : `https://${s}`;
-
-export const dynamic = "force-dynamic";
-
-export default async function ListingGridPage() {
-    const rows = await prisma.listing.findMany({
-        take: 50,
-        include: { provider: true },
-        orderBy: { createdAt: "desc" },
+export default async function ListingPage() {
+    // Fetch listings from your database
+    const listings = await prisma.listing.findMany({
+        orderBy: { id: "asc" },
     });
 
     return (
-        <main className="p-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {rows.map((r) => {
-                const vesselUrl = toUrl(r.sourceUrl);                   // <-- vessel website (Dataset column D)
-                const landingUrl = toUrl(r.provider?.website);           // <-- landing homepage (Dataset column B)
-                const internalUrl = `/listing/${r.id}`;                   // optional internal profile
+        <main className="max-w-6xl mx-auto px-4 py-8">
+            {/* Back to Homepage */}
+            <div className="mb-6">
+                <Link
+                    href="/"
+                    className="inline-block bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition"
+                >
+                    ← Back to Homepage
+                </Link>
+            </div>
 
-                return (
-                    <div key={r.id} className="rounded-2xl p-4 shadow hover:shadow-lg border bg-white">
-                        <h3 className="font-semibold text-lg mb-1">{r.title || "Untitled Vessel"}</h3>
-                        <p className="text-sm opacity-80">{[r.city, r.state].filter(Boolean).join(", ")}</p>
+            <h1 className="text-4xl font-bold mb-8 text-center">Available Listings</h1>
 
-                        <div className="mt-4 flex flex-wrap gap-3">
-                            {/* Now "View details" = VESSEL WEBSITE */}
-                            {vesselUrl && (
-                                <a
-                                    href={vesselUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-lg border px-3 py-1.5 hover:bg-gray-50"
+            {listings.length === 0 ? (
+                <p className="text-center text-gray-600">No listings available yet.</p>
+            ) : (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {listings.map((listing) => (
+                        <div
+                            key={listing.id}
+                            className="border rounded-lg shadow-sm bg-white p-4 flex flex-col justify-between"
+                        >
+                            <div>
+                                <h2 className="text-xl font-semibold mb-2">{listing.title}</h2>
+                                {listing.city && listing.state && (
+                                    <p className="text-gray-500 text-sm mb-2">
+                                        {listing.city}, {listing.state}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="mt-4 space-y-2">
+                                {/* View Provider (internal route) */}
+                                <Link
+                                    href={`/listing/${listing.id}`}
+                                    className="block text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
                                 >
-                                    View details
-                                </a>
-                            )}
+                                    View Provider
+                                </Link>
 
-                            {/* Keep the landing link as "Visit provider" */}
-                            {landingUrl && (
-                                <a
-                                    href={landingUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-lg border px-3 py-1.5 hover:bg-gray-50"
-                                >
-                                    Visit provider
-                                </a>
-                            )}
-
-                            {/* Optional: keep an internal page link with a new label */}
-                            <Link href={internalUrl} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
-                                More info
-                            </Link>
+                                {/* View Detail (outbound but same tab) */}
+                                {listing.providerWebsite && (
+                                    <Link
+                                        href={listing.providerWebsite}
+                                        className="block text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition"
+                                    >
+                                        View Detail
+                                    </Link>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
+                    ))}
+                </div>
+            )}
         </main>
     );
 }
