@@ -4,27 +4,25 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "cross-env LIGHTNINGCSS_IGNORE_NATIVE=1 next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "import:xls": "tsx scripts/import-from-xls.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "@tailwindcss/postcss": "^4.1.12",
-    "autoprefixer": "^10.4.21",
     "next": "14.2.5",
-    "postcss": "^8.4.31",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^4.1.12",
-    "xlsx": "^0.18.5"
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "cross-env": "^10.0.0",
-    "prisma": "^5.22.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.6.2"
+    "@tailwindcss/postcss": "^4.1.12",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
+    "lightningcss": "^1.25.1",
+    "tsx": "^4.19.1",
+    "typescript": "5.x"
   },
   "engines": {
     "node": ">=18.18.0"

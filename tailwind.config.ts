@@ -1,14 +1,18 @@
-﻿// tailwind.config.ts
-import type { Config } from "tailwindcss";
-
-export default {
+﻿/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
-    "./src/app/**/*.{ts,tsx}",
-    "./src/components/**/*.{ts,tsx}",
-    "./src/lib/**/*.{ts,tsx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        net: "radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        net: "22px 22px",
+      },
+    },
   },
   plugins: [],
-} satisfies Config;
+};

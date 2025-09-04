@@ -1,21 +1,35 @@
 import "./globals.css";
-import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Find Your Next Catch",
+    description: "Browse Southern California sportfishing charters",
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
-            <body className="min-h-screen bg-gradient-to-b from-sky-50 to-white text-gray-900 antialiased">
-                <header className="border-b bg-white/70 backdrop-blur">
-                    <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-6">
-                        <Link href="/" className="font-semibold">FindYourNextCatch</Link>
-                        <nav className="flex items-center gap-4 text-sm">
-                            <Link href="/">Home</Link>
-                            <Link href="/listing">Listings</Link>
-                        </nav>
+            <body
+                className="min-h-screen bg-fixed bg-cover bg-top text-slate-900"
+                style={{
+                    backgroundImage:
+                        "linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.35)), url('/images/ocean-bg.jpg')",
+                }}
+            >
+                <div className="mx-auto max-w-6xl p-4 md:p-8">
+                    <div className="rounded-2xl bg-white/70 backdrop-blur-md shadow-lg">
+                        {children}
                     </div>
-                </header>
-                <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+                </div>
             </body>
-        </html>
+
+            {/* Optional centered content shell with a soft, readable surface */}
+            <div className="mx-auto max-w-6xl p-4 md:p-8">
+                <div className="rounded-2xl bg-white/70 backdrop-blur-md shadow-lg">
+                    {children}
+                </div>
+            </div>
+        </body>
+        </html >
     );
 }
