@@ -1,0 +1,386 @@
+Awesome—here’s a clean wrap-up plus the **exact files & commands** you need so you can pick this back up later anywhere.
+
+---
+
+# 🔧 What we fixed/built
+
+* **Vercel build errors**
+
+  * BOM + broken `package.json` (replaced with valid JSON).
+  * Tailwind v4/PostCSS error (moved plugin to `@tailwindcss/postcss`).
+  * LightningCSS native module error (avoided extra hacks).
+  * `cross-env` / engines warnings (removed when not needed).
+  * Prisma issues (added `postinstall: prisma generate`, stable client import).
+* **UI**
+
+  * Global **ocean background** (fixed layer so it persists on scroll across pages).
+  * Homepage **CTA** button (“Vessels”) with white bg, black text + border.
+  * Listing page: “**Vessel Information**” and “**Landing Website**” (same tab), removed “More info”.
+  * **Back** button on `/listing`.
+* **Next/Prisma**
+
+  * Added `src/lib/prisma.ts` singleton.
+  * Made `/listing` **dynamic** so it won’t fail prerender if DB/env is missing.
+
+---
+
+# 📁 Files (copy/paste as-is)
+
+## `package.json` (root)
+
+```json
+{
+  "name": "findyournextcatch",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "postinstall": "prisma generate"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "clsx": "^2.1.1",
+    "next": "14.2.32",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "@types/node": "^20.14.12",
+    "@types/react": "^18.3.3",
+    "prisma": "^6.15.0",
+    "typescript": "^5.6.3"
+  }
+}
+```
+
+> If VS Code ever complains again about JSON, make sure there’s **no BOM** and it’s saved as **UTF-8**.
+
+---
+
+## `postcss.config.js` (root)
+
+```js
+/** Tailwind v4 uses @tailwindcss/postcss */
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {}
+  }
+};
+```
+
+---
+
+## `src/app/globals.css`
+
+```css
+@import "tailwindcss";
+
+/* Optional: tiny readability bump over the image */
+:root { --overlay: rgba(255,255,255,0.0); } /* tweak if you want a wash */
+body { color: #0f172a; }
+```
+
+---
+
+## `src/app/layout.tsx`
+
+```tsx
+import type { Metadata } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Find Your Next Catch",
+  description: "Browse sportfishing vessels across Southern California",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      {/* Full-screen fixed background that persists across routes & scroll */}
+      <body className="relative min-h-screen">
+        <div
+          aria-hidden
+          className="fixed inset-0 -z-10 bg-top bg-no-repeat bg-cover"
+          style={{ backgroundImage: "url('/bg-ocean.jpg')" }}
+        />
+        {/* Optional overlay wash over the image (set --overlay in CSS) */}
+        <div className="fixed inset-0 -z-10" style={{ background: "var(--overlay)" }} />
+
+        {/* App content */}
+        <div className="min-h-screen">
+          {children}
+        </div>
+      </body>
+    </html>
+  );
+}
+```
+
+> Make sure your image is at **`public/bg-ocean.jpg`**.
+
+---
+
+## `src/lib/prisma.ts`
+
+```ts
+import { PrismaClient } from "@prisma/client";
+
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"]
+  });
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+```
+
+---
+
+## `src/components/BackButton.tsx`
+
+```tsx
+"use client";
+
+import { useRouter } from "next/navigation";
+import clsx from "clsx";
+
+type Props = {
+  className?: string;
+  label?: string;
+};
+
+export default function BackButton({ className, label = "← Back" }: Props) {
+  const router = useRouter();
+  return (
+    <button
+      onClick={() => router.back()}
+      className={clsx(
+        "inline-flex items-center gap-2 rounded-lg border border-black px-3 py-1.5",
+        "bg-white text-black hover:bg-gray-50",
+        className
+      )}
+      aria-label="Go back"
+      type="button"
+    >
+      {label}
+    </button>
+  );
+}
+```
+
+---
+
+## `src/app/page.tsx` (Homepage)
+
+```tsx
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+
+const isUrl = (s?: string | null) =>
+  !!s && (/^https?:\/\//i.test(s) || (/\.[a-z]{2,}($|[/?#])/i.test(s) && !/\s/.test(s)));
+
+const toUrl = (s?: string | null) =>
+  !isUrl(s) ? null : /^https?:\/\//i.test(s!) ? s! : `https://${s}`;
+
+export default async function HomePage() {
+  // Optional: show a few latest vessels. Safe fallback if DB/env is missing.
+  let featured: Awaited<ReturnType<typeof prisma.listing.findMany>> = [];
+  try {
+    featured = await prisma.listing.findMany({
+      take: 6,
+      include: { provider: true },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch {
+    featured = [];
+  }
+
+  return (
+    <main className="mx-auto max-w-6xl p-6">
+      {/* Hero */}
+      <section className="flex flex-col items-center text-center py-16">
+        <h1 className="text-6xl font-extrabold tracking-tight mb-4 drop-shadow">
+          Find Your Next Catch
+        </h1>
+        <p className="text-lg mb-8">Browse sportfishing vessels across Southern California.</p>
+
+        <Link
+          href="/listing"
+          className="px-6 py-3 border border-black bg-white text-black rounded-lg shadow hover:bg-gray-50 transition"
+        >
+          Vessels
+        </Link>
+      </section>
+
+      {/* Latest vessels (optional) */}
+      {featured.length > 0 && (
+        <section className="mt-10">
+          <h2 className="text-xl font-semibold mb-4">Latest vessels</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {featured.map((r) => {
+              const vesselUrl = toUrl(r.sourceUrl);          // external
+              const landingUrl = toUrl(r.provider?.website); // external
+              return (
+                <div key={r.id} className="rounded-2xl p-4 shadow border bg-white/90">
+                  <h3 className="font-medium">{r.title || "Untitled Vessel"}</h3>
+                  <p className="text-sm text-gray-600">
+                    {[r.city, r.state].filter(Boolean).join(", ")}
+                  </p>
+
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    {vesselUrl && (
+                      <a href={vesselUrl} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+                        Vessel Information
+                      </a>
+                    )}
+                    {landingUrl && (
+                      <a href={landingUrl} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+                        Landing Website
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+    </main>
+  );
+}
+```
+
+---
+
+## `src/app/listing/page.tsx` (Listing index)
+
+```tsx
+import BackButton from "@/components/BackButton";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic"; // avoid prerender failures
+
+const isUrl = (s?: string | null) =>
+  !!s && (/^https?:\/\//i.test(s) || (/\.[a-z]{2,}($|[/?#])/i.test(s) && !/\s/.test(s)));
+
+const toUrl = (s?: string | null) =>
+  !isUrl(s) ? null : /^https?:\/\//i.test(s!) ? s! : `https://${s}`;
+
+export default async function ListingPage() {
+  let data: Awaited<ReturnType<typeof prisma.listing.findMany>> = [];
+  try {
+    data = await prisma.listing.findMany({
+      include: { provider: true },
+      orderBy: { createdAt: "desc" },
+      take: 60,
+    });
+  } catch {
+    data = [];
+  }
+
+  return (
+    <main className="mx-auto max-w-6xl p-6">
+      <div className="mb-6">
+        <BackButton />
+      </div>
+
+      <h1 className="text-3xl font-bold mb-4">Vessels</h1>
+
+      {data.length === 0 ? (
+        <p className="text-gray-700">No vessels available yet.</p>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {data.map((r) => {
+            const vesselUrl = toUrl(r.sourceUrl);
+            const landingUrl = toUrl(r.provider?.website);
+
+            return (
+              <div key={r.id} className="rounded-2xl p-4 shadow border bg-white/90">
+                <h3 className="font-medium">{r.title || "Untitled Vessel"}</h3>
+                <p className="text-sm text-gray-600">
+                  {[r.city, r.state].filter(Boolean).join(", ")}
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {vesselUrl && (
+                    <a href={vesselUrl} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+                      Vessel Information
+                    </a>
+                  )}
+                  {landingUrl && (
+                    <a href={landingUrl} className="rounded-lg border px-3 py-1.5 hover:bg-gray-50">
+                      Landing Website
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </main>
+  );
+}
+```
+
+---
+
+# 🧩 Where your image goes
+
+* File path: **`public/bg-ocean.jpg`**
+  (If you ever rename, update the URL in `layout.tsx`.)
+
+---
+
+# 🟦 PowerShell: install deps, commit, push
+
+> Run these anytime you add/modify the files above.
+
+```powershell
+# From your project root
+npm install
+
+# If clsx wasn’t already installed for the BackButton:
+npm install clsx
+
+# (Optional) make sure Prisma client is generated locally
+npx prisma generate
+
+# Stage everything you changed (including the image)
+git add package.json postcss.config.js `
+  src/app/globals.css src/app/layout.tsx `
+  src/lib/prisma.ts `
+  src/components/BackButton.tsx `
+  src/app/page.tsx src/app/listing/page.tsx `
+  public/bg-ocean.jpg
+
+git commit -m "feat(ui): global fixed ocean bg, homepage CTA, listing buttons, back button, prisma singleton"
+git push origin main
+```
+
+Vercel will auto-deploy from `main`. If you need to trigger manually from CLI you can also run `vercel --prod` (but usually the Git integration is perfect).
+
+---
+
+# 💰 Next steps (monetization quick plan)
+
+* **Phase 1 (now):** Free listings to land vessels + social proof; add a simple `/partners` page + form so captains can submit their boat.
+* **Phase 2:** “**Featured placement**” (monthly/quarterly fee) + simple “**Lead Forwarding**” (email form → captain) to attribute value.
+* **Phase 3:** Add **book-now** pilot on 1–2 boats (Stripe Connect), 8–12% fee, test price elasticity.
+* **Upsells:** add-ons like tackle, premium rods, photo packages at checkout, sponsorship slots for bait/tackle brands.
+
+If you want, I can hand you a ready-to-drop `/partners` page and a captain intake form next.
+
+Good luck, and nice work pushing through all those build gremlins!

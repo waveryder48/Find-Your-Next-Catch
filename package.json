@@ -18,6 +18,7 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@types/node": "^20.19.13",
     "@types/react": "^18.3.11",
     "prisma": "^6.15.0",

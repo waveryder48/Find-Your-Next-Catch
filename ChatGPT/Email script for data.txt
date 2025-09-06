@@ -1,0 +1,22 @@
+Subject: Quick: free SoCal sportfishing listing to send you more bookings
+
+Hi {{Name}},
+
+I’m assembling a SoCal sportfishing directory that helps anglers compare trips and book directly with local operators. I’d love to include {{Boat/Operation}} with a free basic listing that links straight to your site.
+
+If you’re open to it, could you share:
+
+Boat/operation name, phone, location
+
+Trip types (½ day, full day, overnight), durations, base prices or ranges
+
+Booking link (your prefered URL)
+
+(Optional) 3–5 photos and a short description
+
+Reply here and I’ll send a private preview of your profile before anything goes live. If you prefer, you can fill this quick form instead: {{intake_form_link}}.
+
+Thanks!
+— {{Your first name}}, SoCal angler & builder
+
+P.S. If you’d rather we sync from your public page, we’ll only use basic facts (no photos/long copy) and always link back. Just say the word.
