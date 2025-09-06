@@ -1,48 +1,50 @@
-﻿@import "tailwindcss";
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* your custom CSS below... */
-
-
-/* Global resets or customizations */
+/* ===== Base resets ===== */
 html,
 body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-        "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    background-color: #f9fafb;
-    /* Tailwind's gray-50 */
-    color: #111827;
-    /* Tailwind's gray-900 */
 }
 
-/* Links */
-a {
-    color: #2563eb;
-    /* Tailwind blue-600 */
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* Utility overrides */
-.container {
-    @apply mx-auto px-4;
-}
-
-html,
 body {
-    background-color: transparent !important;
+    @apply bg-gray-50 text-gray-900 antialiased;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-main,
-section,
-header,
-footer,
+/* ===== Typography ===== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    @apply font-semibold text-gray-900;
+}
+
+p {
+    @apply text-gray-700 leading-relaxed;
+}
+
+/* ===== Links ===== */
+a {
+    @apply text-blue-600 hover:text-blue-800 transition-colors;
+}
+
+/* ===== Utility helpers ===== */
 .container {
-    background: transparent;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.btn {
+    @apply inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition;
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700;
 }

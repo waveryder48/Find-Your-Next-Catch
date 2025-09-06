@@ -64,6 +64,8 @@ model Listing {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  sources ListingSource[]
+
   @@index([city, state])
   @@index([providerId])
 }
@@ -118,86 +120,61 @@ model Clickout {
 
   @@index([listingId])
 }
+
 model Source {
-  id              String   @id @default(cuid())
+  id              String       @id @default(cuid())
   kind            SourceKind
   operatorName    String
-  contactEmail    String?   // optional; good to have
-  operatorSiteUrl String?   // public operator/landing homepage
-  proofText       String?   // copy/paste’d permission reply
-  proofUrl        String?   // link to email/DM screenshot etc.
+  contactEmail    String?
+  operatorSiteUrl String?
+  proofText       String?
+  proofUrl        String?
   status          SourceStatus @default(ACTIVE)
-
-  // Permissions/granularity (what we're allowed to show/sync)
-  allowFacts      Boolean  @default(true)   // name, phone, address, trip facts
-  allowPrices     Boolean  @default(true)
-  allowPhotos     Boolean  @default(false)
-  allowLongCopy   Boolean  @default(false)  // paragraphs / blog-like content
-  allowSync       Boolean  @default(true)   // permission to auto-sync from site
-
-  // Ops
+  allowFacts      Boolean      @default(true)
+  allowPrices     Boolean      @default(true)
+  allowPhotos     Boolean      @default(false)
+  allowLongCopy   Boolean      @default(false)
+  allowSync       Boolean      @default(true)
   lastSyncAt      DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
-  listings        ListingSource[]
-  previewTokens   PreviewToken[]
-}
-
-model Listing {
-  id            Int       @id @default(autoincrement())
-  boatName      String
-  captainName   String?
-  phone         String?
-  locationText  String?
-  species       String[]
-  durationHours Float?
-  priceUSD      Float?
-  bookingUrl    String     @unique
-  detailUrl     String?
-  sourceDomain  String?
-  imageUrls     String[]
-  description   String?
-  isActive      Boolean    @default(true)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-
-  sources       ListingSource[]
+  listings      ListingSource[]
+  previewTokens PreviewToken[]
 }
 
 model ListingSource {
-  // many-to-many with extra metadata
-  id           String   @id @default(cuid())
-  listingId    Int
-  sourceId     String
-  role         ListingSourceRole @default(PRIMARY) // PRIMARY / SECONDARY / MANUAL
-  notes        String?
-  firstSeenAt  DateTime @default(now())
-  lastSeenAt   DateTime @default(now())
+  id          String            @id @default(cuid())
+  listingId   String // 👈 match Listing.id (String cuid)
+  sourceId    String
+  role        ListingSourceRole @default(PRIMARY)
+  notes       String?
+  firstSeenAt DateTime          @default(now())
+  lastSeenAt  DateTime          @default(now())
 
-  listing      Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  source       Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  source  Source  @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 
   @@unique([listingId, sourceId])
   @@index([sourceId])
 }
 
 model PreviewToken {
-  id         String   @id @default(cuid())
-  token      String   @unique
-  sourceId   String
-  listingId  Int?
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  token     String   @unique
+  sourceId  String
+  listingId String? // 👈 match Listing.id (String cuid)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 
-  source     Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  source Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 }
 
 enum SourceKind {
   INTAKE_FORM
   OPERATOR_PERMISSION
   PUBLIC_SYNC
-  PARTNER_FEED        // e.g., CSV/Sheet/JSON they share
+  PARTNER_FEED
 }
 
 enum SourceStatus {

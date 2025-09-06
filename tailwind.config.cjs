@@ -1,18 +1,10 @@
 ﻿/** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
-        "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-        "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/**/*.{js,ts,jsx,tsx,mdx}",
+        "./app/**/*.{js,ts,jsx,tsx,mdx}",
+        "./pages/**/*.{js,ts,jsx,tsx,mdx}"
     ],
-    theme: {
-        extend: {
-            backgroundImage: {
-                net: "radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px)",
-            },
-            backgroundSize: {
-                net: "22px 22px",
-            },
-        },
-    },
-    plugins: [require('@tailwindcss/line-clamp')],
+    theme: { extend: {} },
+    plugins: [require("@tailwindcss/line-clamp")],
 };

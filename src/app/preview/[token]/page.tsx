@@ -1,12 +1,32 @@
-import { resolvePreviewToken } from "@/server/sources";
+// src/app/preview/[token]/page.tsx
+
+import prisma from "@/server/prisma"; // or: ../../../server/prisma if you haven't set the "@/"" alias
 import { notFound } from "next/navigation";
-import prisma from "@/server/prisma"; // your prisma helper
 
 export default async function PreviewPage({ params }: { params: { token: string } }) {
-    const pt = await resolvePreviewToken(params.token);
-    if (!pt) return notFound();
+    const IS_MOCK = process.env.NEXT_PUBLIC_MOCK_MODE === "true";
 
-    // show either a single listing preview or a source-wide feed
+    // Mock mode: render a static message, no DB access
+    if (IS_MOCK) {
+        return (
+            <main className="mx-auto max-w-3xl p-6">
+                <h1 className="text-2xl font-semibold mb-4">Private Preview (Mock)</h1>
+                <p className="text-sm text-gray-600">
+                    Preview is disabled in mock mode. Turn mock mode off to enable database-backed previews.
+                </p>
+            </main>
+        );
+    }
+
+    // Real mode: require prisma to be available
+    if (!prisma) return notFound();
+
+    const pt = await prisma.previewToken.findUnique({
+        where: { token: params.token },
+        include: { source: true },
+    });
+    if (!pt || pt.expiresAt < new Date()) return notFound();
+
     const listing = pt.listingId
         ? await prisma.listing.findUnique({ where: { id: pt.listingId } })
         : null;
@@ -16,24 +36,17 @@ export default async function PreviewPage({ params }: { params: { token: string 
             <h1 className="text-2xl font-semibold mb-4">Private Preview</h1>
             <p className="text-sm mb-6">For: {pt.source.operatorName}</p>
             {listing ? (
-                <ListingCardPreview listing={listing} />
+                <article className="rounded-2xl border p-4 shadow-sm">
+                    <h2 className="text-xl font-medium">
+                        {("title" in listing && listing.title) || "Listing"}
+                    </h2>
+                    {"city" in listing && (
+                        <p className="text-sm opacity-80">{(listing as any).city}</p>
+                    )}
+                </article>
             ) : (
                 <p>No specific listing attached. Ask us for a boat preview link.</p>
             )}
         </main>
-    );
-}
-
-// Make sure ListingCardPreview is a simple, server-safe component or convert to client as needed.
-function ListingCardPreview({ listing }: { listing: any }) {
-    return (
-        <article className="rounded-2xl border p-4 shadow-sm">
-            <h2 className="text-xl font-medium">{listing.boatName}</h2>
-            <p className="text-sm opacity-80">{listing.locationText}</p>
-            <div className="mt-2 text-sm">
-                {listing.priceUSD ? <>From ${listing.priceUSD.toFixed(0)}</> : <>Contact for pricing</>}
-                {listing.durationHours ? <span> · {listing.durationHours}h</span> : null}
-            </div>
-        </article>
     );
 }
