@@ -10,7 +10,10 @@ export type ListingLite = {
     boatName: string;
     captainName?: string;
     phone?: string;
-    locationText?: string;
+    locationText?: string;   // e.g., "San Diego · H&M Landing"
+    landingName?: string;    // e.g., "H&M Landing"
+    lat?: number;            // landing latitude
+    lng?: number;            // landing longitude
     species: string[];
     durationHours?: number;
     priceUSD?: number;
