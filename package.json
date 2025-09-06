@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "import:xls": "tsx scripts/import-from-xls.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "node scripts/conditionally-generate-prisma.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
