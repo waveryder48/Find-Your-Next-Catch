@@ -6,5 +6,5 @@ module.exports = {
         "./pages/**/*.{js,ts,jsx,tsx,mdx}"
     ],
     theme: { extend: {} },
-    plugins: [require("@tailwindcss/line-clamp")],
+    plugins: [] // <- IMPORTANT: no "@tailwindcss/line-clamp" here
 };
