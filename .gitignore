@@ -39,3 +39,31 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+build/
+.vercel/
+coverage/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# Env & local configs
+.env
+.env.*
+!.env.example
+
+# Prisma (keep migrations tracked; ignore sqlite if ever created)
+*.db
+*.db-journal
+
+# Don’t commit your local Excel data file(s)
+public/landings_vessels*.xlsx
+public/landings_vessels*.xls
