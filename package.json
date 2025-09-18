@@ -1,0 +1,31 @@
+{
+  "name": "fync",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit push",
+    "db:seed": "tsx scripts/seed.ts",
+    "scrape:fr": "tsx scripts/scrape-trips.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "dotenv": "^17.2.2",
+    "drizzle-orm": "^0.33.0",
+    "next": "14.2.5",
+    "pg": "^8.11.5",
+    "playwright": "^1.47.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.22.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.2"
+  }
+}

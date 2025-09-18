@@ -1,0 +1,45 @@
+{
+  "name": "fync",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "drizzle:push": "drizzle-kit push",
+    "drizzle:studio": "drizzle-kit studio",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit push",
+    "db:seed": "tsx scripts/seed.ts",
+    "scrape:fr": "tsx scripts/scrape-trips.ts"
+  },
+  "dependencies": {
+    "bottleneck": "^2.19.5",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.6.1",
+    "drizzle-orm": "^0.33.0",
+    "lucide-react": "^0.441.0",
+    "next": "^14.2.5",
+    "node-xlsx": "^0.24.0",
+    "pg": "^8.11.5",
+    "playwright": "^1.47.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "robots-parser": "^3.0.1",
+    "undici": "^6.21.3",
+    "zod": "^3.23.8",
+    "xlsx": "^0.18.5",
+  },
+  "devDependencies": {
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "@types/node": "^20.12.12",
+    "autoprefixer": "^10.4.18",
+    "drizzle-kit": "^0.22.7",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.9",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.2"
+  }
+}

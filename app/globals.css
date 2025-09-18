@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+    @apply bg-white text-gray-900;
+}
+
+
+.prose-muted {
+    @apply text-gray-600;
+}
