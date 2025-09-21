@@ -12,3 +12,4 @@ async function main() {
   for (const v of targets) console.log("-", v.name, v.website);
 }
 main();
+

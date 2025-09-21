@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { landings, vessels, vesselLandings } from "@/drizzle/schema";
 import { and, eq, ilike, inArray, sql } from "drizzle-orm";
@@ -62,3 +62,4 @@ export async function GET(req: Request) {
         vessels: Array.from(byVessel.values()),
     });
 }
+

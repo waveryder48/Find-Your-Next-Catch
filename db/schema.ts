@@ -15,3 +15,4 @@ export const vessels = pgTable("vessels", {
     .references(() => landings.id, { onDelete: "cascade" }),
   imageUrl: text("image_url"), // optional; migration already added this column
 });
+

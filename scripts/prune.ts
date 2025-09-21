@@ -1,6 +1,6 @@
 ﻿import "dotenv/config";
 import { db } from "../db/index";
-import { tripOffers } from "../db/schema.offers";
+import { tripOffers } from "../db/schema.Trips";
 import { sql, lt, or } from "drizzle-orm";
 
 async function main() {
@@ -14,3 +14,4 @@ async function main() {
   console.log("Pruned past trips.");
 }
 main().catch(e => { console.error(e); process.exit(1); });
+

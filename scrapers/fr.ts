@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+﻿import { chromium } from "playwright";
 import * as cheerio from "cheerio";
 import crypto from "node:crypto";
 import { db } from "../lib/db";
@@ -127,3 +127,4 @@ export async function scrapeFrSites({ days = 21 }: { days?: number } = {}) {
             await browser.close();
         }
     }
+

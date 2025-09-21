@@ -72,3 +72,4 @@ export default function Filters({ landings, vessels }: { landings: Option[]; ves
     </div>
   );
 }
+

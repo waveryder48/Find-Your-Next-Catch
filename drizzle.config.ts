@@ -1,4 +1,4 @@
-import { config as loadEnv } from "dotenv";
+﻿import { config as loadEnv } from "dotenv";
 loadEnv({ path: ".env.local" });
 
 import type { Config } from "drizzle-kit";
@@ -14,3 +14,4 @@ export default {
     strict: false,   // <— important: do NOT drop/alter unknown tables/cols
     verbose: true,
 } satisfies Config;
+

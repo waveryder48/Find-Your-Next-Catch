@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { landings, vesselLandings } from "@/drizzle/schema";
 import { sql, eq } from "drizzle-orm";
@@ -19,3 +19,4 @@ export async function GET() {
 
     return NextResponse.json({ landings: rows });
 }
+

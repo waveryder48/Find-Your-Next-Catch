@@ -36,3 +36,4 @@ async function main() {
   console.log("Migration complete.");
 }
 main().catch(e => { console.error(e); process.exit(1); });
+

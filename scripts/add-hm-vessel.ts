@@ -27,3 +27,4 @@ async function main() {
   console.log("Inserted/ensured H&M Landing + schedules vessel.");
 }
 main();
+

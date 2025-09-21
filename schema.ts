@@ -1,19 +1,23 @@
-import { pgTable, text, varchar, timestamp, integer, boolean, index, primaryKey, pgEnum, numeric } from "drizzle-orm/pg-core";
+﻿import { pgTable, text, varchar, timestamp, integer, boolean, index, primaryKey, pgEnum, numeric } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 export const tripSource = pgEnum("trip_source", ["FR", "HM", "OTHER"]);
 export const fareTierType = pgEnum("fare_tier_type", ["ADULT", "JUNIOR", "SENIOR", "MILITARY", "STUDENT", "OTHER"]);
 
+// in schema.ts landings definition
 export const landings = pgTable("landings", {
-    id: text("id").primaryKey(),             // use crypto.randomUUID()
+    id: text("id").primaryKey(),
     name: varchar("name", { length: 256 }).notNull(),
     slug: varchar("slug", { length: 256 }).notNull().unique(),
     website: varchar("website", { length: 512 }).notNull().unique(),
+    city: varchar("city", { length: 80 }),      // <--- NEW (optional)
+    state: varchar("state", { length: 2 }),     // <--- NEW (optional)
     createdAt: timestamp("created_at", { withTimezone: false }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: false }).notNull().defaultNow(),
 }, (t) => ({
     nameIdx: index("landings_name_idx").on(t.name),
 }));
+
 
 export const vessels = pgTable("vessels", {
     id: text("id").primaryKey(),
@@ -112,3 +116,4 @@ export const tripRelations = relations(trips, ({ many }) => ({
     fareTiers: many(fareTiers),
     promotions: many(tripPromotions),
 }));
+

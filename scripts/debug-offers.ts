@@ -1,6 +1,6 @@
 ﻿import "dotenv/config";
 import { db } from "../db";
-import { tripOffers } from "../db/schema.offers";
+import { tripOffers } from "../db/schema.Trips";
 import { sql, desc } from "drizzle-orm";
 function domain(u:string){ try{ return new URL(u).hostname.replace(/^www\./,""); } catch { return ""; } }
 async function main(){
@@ -10,3 +10,4 @@ async function main(){
   }
 }
 main();
+

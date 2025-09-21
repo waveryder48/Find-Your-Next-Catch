@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, timestamp, integer, boolean, index, uniqueIndex, primaryKey, pgEnum, numeric } from "drizzle-orm/pg-core";
+﻿import { pgTable, text, varchar, timestamp, integer, boolean, index, uniqueIndex, primaryKey, pgEnum, numeric } from "drizzle-orm/pg-core";
 
 import { relations } from "drizzle-orm";
 
@@ -114,3 +114,4 @@ export const tripRelations = relations(trips, ({ many }) => ({
     fareTiers: many(fareTiers),
     promotions: many(tripPromotions),
 }));
+

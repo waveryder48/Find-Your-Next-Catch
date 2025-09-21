@@ -10,3 +10,4 @@ async function main() {
   console.log("Deactivated legacy targets.");
 }
 main().catch(e=>{console.error(e);process.exit(1);});
+

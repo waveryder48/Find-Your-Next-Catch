@@ -17,3 +17,4 @@ async function main() {
   console.log("Unique index created (or already exists).");
 }
 main().catch(e => { console.error(e); process.exit(1); });
+

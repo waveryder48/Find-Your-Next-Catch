@@ -1,31 +1,52 @@
 {
   "name": "fync",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "seed:min": "tsx scripts/seed-minimal.ts",
+    "import:lv": "tsx scripts/import-landings-vessels.ts",
+    "import:schedule": "tsx scripts/import-schedule.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit push",
-    "db:seed": "tsx scripts/seed.ts",
-    "scrape:fr": "tsx scripts/scrape-trips.ts"
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "approve": "pnpm approve-builds esbuild",
+    "cleanup:demo": "tsx scripts/cleanup-demo-seed.ts",
+    "scrape": "tsx scripts/scrape.ts",
+    "scrape:xlsx": "tsx scripts/scrape-from-schedules.ts",
+    "seed:landing-locations": "tsx scripts/seed-landing-locations.ts",
+    "admin:purge": "tsx scripts/admin-purge-trips.ts"
   },
   "dependencies": {
-    "cheerio": "^1.0.0",
-    "dotenv": "^17.2.2",
-    "drizzle-orm": "^0.33.0",
-    "next": "14.2.5",
-    "pg": "^8.11.5",
-    "playwright": "^1.47.2",
+    "cheerio": "1.1.2",
+    "date-fns": "^4.1.0",
+    "dotenv": "17.2.2",
+    "drizzle-orm": "0.33.0",
+    "next": "15.5.3",
+    "pg": "8.16.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "0.18.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.22.7",
-    "tsx": "^4.19.2",
-    "typescript": "^5.6.2"
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "24.5.2",
+    "@types/react": "19.1.13",
+    "autoprefixer": "^10.4.20",
+    "drizzle-kit": "0.22.8",
+    "playwright": "1.55.0",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^4.0.0",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2"
+  },
+  "engines": {
+    "node": ">=18.17.0"
   }
 }

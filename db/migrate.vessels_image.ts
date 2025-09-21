@@ -17,3 +17,4 @@ async function main() {
   console.log("vessels.image_url ready.");
 }
 main().catch(e => { console.error(e); process.exit(1); });
+

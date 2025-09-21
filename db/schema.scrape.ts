@@ -11,3 +11,4 @@ export const scrapeTargets = pgTable("scrape_targets", {
   lastSuccessAt: timestamp("last_success_at", { withTimezone: false }).default(null),
   lastStatus: text("last_status").default(null),
 });
+

@@ -1,0 +1,40 @@
+
+FYNC Stack Engineer — Upgrade Prep Checklist
+============================================
+
+✅ STEP 1: Message to Paste in Preview Thread
+--------------------------------------------
+Once you open FYNC Stack Engineer in the preview panel after upgrading to Pro, paste this message:
+
+---
+I’m building a fishing charter aggregator modeled on FishingBooker. I’ve uploaded `landings_vessels.xlsx` — please inspect it and propose a normalized Postgres schema for `vessels`, `landings`, and related entities. Wait for my confirmation before generating migrations or seed/import scripts. I’m using Prisma + Next.js + Tailwind on Vercel. Ask before modifying any code.
+---
+
+Then upload your `.xlsx` file in the preview chat (or paste headers/sample rows).
+
+
+📂 STEP 2: Files to Upload (in preview chat)
+--------------------------------------------
+Upload any of the following that apply:
+
+- `landings_vessels.xlsx` – main dataset
+- `package.json` – project dependencies
+- `prisma/schema.prisma` – optional if you already have it
+- `tsconfig.json`, `.eslintrc.json`, `tailwind.config.js` – for config updates
+- `app/api/*` or `scrapers/*.ts` – if you want FYNC to help modify those
+
+
+⚙️ STEP 3: Follow-up Commands You Can Use
+-----------------------------------------
+- “Generate seed + import script from this Excel file.”
+- “Wire up an API route to return active vessels with filters.”
+- “Create a listings page that hits that API and shows cards + map.”
+- “Build a scraper for these 3 charter sites (here are URLs).”
+- “Schedule daily scraping and avoid duplicate entries.”
+
+
+📌 Notes
+--------
+- You don’t need to redo anything — your GPT configuration is saved.
+- The preview thread always starts fresh, so re-upload your data/code as needed.
+- Use GPT-4 Turbo (Pro model) for deeper reasoning, faster codegen, and fewer limitations.

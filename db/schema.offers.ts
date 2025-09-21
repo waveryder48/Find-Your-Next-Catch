@@ -19,3 +19,4 @@ export const tripOffers = pgTable("trip_offers", {
   includePermits: boolean("include_permits"),
   lastSeenAt: timestamp("last_seen_at", { withTimezone: false }).defaultNow(),
 });
+

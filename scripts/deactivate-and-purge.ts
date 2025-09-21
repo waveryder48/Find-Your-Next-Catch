@@ -1,7 +1,7 @@
 ﻿import "dotenv/config";
 import { db } from "../db";
 import { scrapeTargets } from "../db/schema.scrape";
-import { tripOffers } from "../db/schema.offers";
+import { tripOffers } from "../db/schema.Trips";
 import { sql, inArray } from "drizzle-orm";
 
 async function main() {
@@ -16,6 +16,7 @@ async function main() {
     where ${tripOffers.sourceUrl} ~ 'fishermanslanding\\.com|hmlanding\\.com'
        or coalesce(${tripOffers.priceCents},0) < 5000
   `);
-  console.log("Purged legacy/low-price offers.");
+  console.log("Purged legacy/low-price Trips.");
 }
 main().catch(e=>{console.error(e);process.exit(1);});
+

@@ -1,76 +1,56 @@
+﻿// app/api/trips/route.ts
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { trips, landings, vessels, fareTiers, tripPromotions } from "@/drizzle/schema";
-import { and, eq, gte, lte, inArray, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+import { db } from "@/db";
 
-export const dynamic = "force-dynamic";
+export async function GET() {
+    try {
+        const result: any = await db.execute(sql`
+      SELECT
+        t.id,
+        t.title,
+        t.depart_local,
+        t.return_local,
+        t.load,
+        t.spots,
+        t.price_includes_fees,
+        t.notes,
+        t.passport_req,
+        v.name AS vessel_name,
+        l.name AS landing_name,
+        l.city AS landing_city,
+        l.state AS landing_state
+      FROM trips t
+      LEFT JOIN vessels v ON v.id = t.vessel_id
+      LEFT JOIN landings l ON l.id = t.landing_id
+      WHERE t.depart_local >= NOW()
+      ORDER BY t.depart_local ASC
+      LIMIT 50
+    `);
 
-export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const landingSlug = searchParams.get("landing") ?? undefined;
-    const from = searchParams.get("from") ?? undefined;
-    const to = searchParams.get("to") ?? undefined;
+        const rows = result.rows ?? result;
 
-    let landingId: string | undefined;
-    if (landingSlug) {
-        const l = await db.query.landings.findFirst({ where: (t, { eq }) => eq(t.slug, landingSlug), columns: { id: true } });
-        if (!l) return NextResponse.json({ trips: [] });
-        landingId = l.id;
+        const data = rows.map((r: any) => ({
+            id: r.id,
+            title: r.title ?? "Trip",
+            depart_local: r.depart_local,
+            return_local: r.return_local,
+            load: r.load ?? null,
+            spots: r.spots ?? null,
+            notes: r.notes ?? null,
+            passport_req: r.passport_req ?? false,
+            priceIncludesFees: r.price_includes_fees ?? false,
+            vesselName: r.vessel_name ?? null,
+            landing: {
+                name: r.landing_name ?? null,
+                city: r.landing_city ?? null,
+                state: r.landing_state ?? null,
+            }
+        }));
+
+        return NextResponse.json({ data }, { headers: { "Cache-Control": "no-store" } });
+    } catch (err: any) {
+        console.error("[/api/trips] error:", err);
+        return NextResponse.json({ data: [], error: err.message }, { status: 500 });
     }
-
-    const now = new Date();
-    const where = and(
-        landingId ? eq(trips.landingId, landingId) : undefined,
-        from ? gte(trips.departLocal, new Date(`${from}T00:00:00`)) : gte(trips.departLocal, now),
-        to ? lte(trips.departLocal, new Date(`${to}T23:59:59`)) : undefined
-    );
-
-    const base = await db.select({
-        id: trips.id, title: trips.title, status: trips.status,
-        departLocal: trips.departLocal, returnLocal: trips.returnLocal,
-        source: trips.source, sourceUrl: trips.sourceUrl,
-        priceIncludesFees: trips.priceIncludesFees, serviceFeePct: trips.serviceFeePct,
-        load: trips.load, spots: trips.spots, notes: trips.notes,
-        lastScrapedAt: trips.lastScrapedAt,
-        landingName: landings.name, landingSlug: landings.slug,
-        vesselName: vessels.name, vesselSlug: vessels.slug,
-    })
-        .from(trips)
-        .innerJoin(landings, eq(landings.id, trips.landingId))
-        .leftJoin(vessels, eq(vessels.id, trips.vesselId))
-        .where(where)
-        .orderBy(trips.departLocal)
-        .limit(200);
-
-    const tripIds = base.map(b => b.id);
-    const [tiers, promos] = await Promise.all([
-        tripIds.length ? db.select().from(fareTiers).where(inArray(fareTiers.tripId, tripIds)) : Promise.resolve([]),
-        tripIds.length ? db.select().from(tripPromotions).where(inArray(tripPromotions.tripId, tripIds)) : Promise.resolve([]),
-    ]);
-
-    const tiersByTrip = new Map<string, any[]>(); for (const t of tiers) (tiersByTrip.get(t.tripId) ?? tiersByTrip.set(t.tripId, []).get(t.tripId)!).push(t);
-    const promosByTrip = new Map<string, any[]>(); for (const p of promos) (promosByTrip.get(p.tripId) ?? promosByTrip.set(p.tripId, []).get(p.tripId)!).push(p);
-
-    const tripsDto = base.map(b => ({
-        id: b.id,
-        title: b.title,
-        status: b.status,
-        departLocal: b.departLocal,
-        returnLocal: b.returnLocal,
-        sourceUrl: b.sourceUrl,
-        priceIncludesFees: b.priceIncludesFees,
-        serviceFeePct: b.serviceFeePct as any,
-        load: b.load,
-        spots: b.spots,
-        notes: b.notes,
-        lastScrapedAt: b.lastScrapedAt,
-        landing: { name: b.landingName, slug: b.landingSlug },
-        vessel: b.vesselName ? { name: b.vesselName, slug: b.vesselSlug! } : null,
-        fareTiers: (tiersByTrip.get(b.id) ?? []).map(t => ({
-            type: t.type, label: t.label, priceCents: t.priceCents, minAge: t.minAge, maxAge: t.maxAge, conditions: t.conditions
-        })),
-        promotions: (promosByTrip.get(b.id) ?? []).map(p => ({ slug: p.slug, summary: p.summary, appliesWhen: p.appliesWhen })),
-    }));
-
-    return NextResponse.json({ trips: tripsDto });
 }

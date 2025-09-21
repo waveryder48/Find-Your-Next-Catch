@@ -1,4 +1,4 @@
-import './globals.css';
+﻿import './globals.css';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                         <Link href="/" className="font-bold text-xl">FYNC</Link>
                         <nav className="flex gap-4 text-sm">
                             <Link href="/landings" className="hover:underline">Landings</Link>
-                            <Link href="/offers" className="hover:underline">Offers</Link>
+                            <Link href="/trips" className="hover:underline">Trips</Link>
                         </nav>
                     </div>
                 </header>

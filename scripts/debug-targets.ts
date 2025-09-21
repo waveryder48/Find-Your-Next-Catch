@@ -10,3 +10,4 @@ async function main(){
   console.log("Active targets by domain:", byDomain);
 }
 main();
+

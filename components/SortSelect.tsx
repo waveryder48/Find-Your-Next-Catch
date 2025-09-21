@@ -21,3 +21,4 @@ export default function SortSelect({ options }:{ options: { value: string; label
     </select>
   );
 }
+

@@ -1,4 +1,4 @@
-// scripts/seed.ts
+﻿// scripts/seed.ts
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
@@ -155,3 +155,4 @@ main().catch((e) => {
     console.error(e);
     process.exit(1);
 });
+

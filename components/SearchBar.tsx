@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, FormEvent } from "react";
 
-export default function SearchBar({ placeholder = "Search offers, vessels, landings…" }:{ placeholder?: string }) {
+export default function SearchBar({ placeholder = "Search Trips, vessels, landings…" }:{ placeholder?: string }) {
   const router = useRouter();
   const params = useSearchParams();
   const [value, setValue] = useState("");
@@ -31,3 +31,4 @@ export default function SearchBar({ placeholder = "Search offers, vessels, landi
     </form>
   );
 }
+

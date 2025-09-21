@@ -38,3 +38,4 @@ async function main() {
   console.log("trip_offers upgraded.");
 }
 main().catch(e => { console.error(e); process.exit(1); });
+

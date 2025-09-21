@@ -1,25 +1,20 @@
 {
   "pages": {
-    "/offers/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/offers/page.js"
-    ],
     "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/landings/[id]/page": [
+    "/trips/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/landings/[id]/page.js"
+      "static/chunks/app/trips/page.js"
     ],
-    "/landings/page": [
+    "/api/trips/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/landings/page.js"
+      "static/chunks/app/api/trips/route.js"
     ]
   }
 }

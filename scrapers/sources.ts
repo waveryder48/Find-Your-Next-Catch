@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+﻿import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
 import * as XLSX from "xlsx";
@@ -58,3 +58,4 @@ export async function loadScheduleSites(): Promise<Site[]> {
     }
     return out.filter(s => !!s.landingSlug && !!s.baseUrl);
 }
+

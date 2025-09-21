@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { db } from "@/lib/db";
 import { landings, vesselLandings } from "@/drizzle/schema";
 import { sql, eq } from "drizzle-orm";
@@ -35,3 +35,4 @@ export default async function LandingsPage() {
         </main>
     );
 }
+
