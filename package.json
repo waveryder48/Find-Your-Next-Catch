@@ -20,7 +20,8 @@
     "scrape": "tsx scripts/scrape.ts",
     "scrape:xlsx": "tsx scripts/scrape-from-schedules.ts",
     "seed:landing-locations": "tsx scripts/seed-landing-locations.ts",
-    "admin:purge": "tsx scripts/admin-purge-trips.ts"
+    "admin:purge": "tsx scripts/admin-purge-trips.ts",
+    "sync:trips": "tsx scripts/syncAllTrips.mts"
   },
   "dependencies": {
     "cheerio": "1.1.2",
@@ -43,6 +44,7 @@
     "playwright": "1.55.0",
     "postcss": "^8.4.41",
     "tailwindcss": "^4.0.0",
+    "ts-node": "^10.9.2",
     "tsx": "4.20.5",
     "typescript": "5.9.2"
   },
